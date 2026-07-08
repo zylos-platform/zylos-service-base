@@ -27,27 +27,22 @@ jobs:
         run: |
           echo "${GITHUB_TOKEN}" | helm registry login ghcr.io -u ${{ github.actor }} --password-stdin
 
-      - name: Inject Version and Package Chart
-        # Extract the version from the GitHub Release tag (e.g., 'v1.2.0' becomes '1.2.0')
-        # Inject it dynamically into Chart.yaml before packaging.
+      - name: Inject Version, Package, and Push
         run: |
-          # Get the tag from the GitHub event (e.g., v0.3.0)
+          # Extract tag and strip the leading 'v'
           RELEASE_TAG="${{ github.event.release.tag_name }}"
-
-          # Strip the leading 'v' to comply with strict SemVer for Helm (e.g., 0.3.0)
           SEMVER_VERSION="${RELEASE_TAG#v}"
 
           echo "Building Chart Version: ${SEMVER_VERSION}"
 
-          # Use 'sed' to dynamically overwrite the version field in Chart.yaml
-          sed -i "s/^version:.*/version: ${SEMVER_VERSION}/" Chart.yaml
+          # Corrected path: Inject version into the sub-directory Chart.yaml
+          sed -i "s/^version:.*/version: ${SEMVER_VERSION}/" zylos-service-base/Chart.yaml
 
-          # Package the chart. It will use the newly injected version.
-          helm package .
+          # Package the chart
+          helm package zylos-service-base
 
-      - name: Push Chart to GHCR (OCI)
-        run: |
-          SEMVER_VERSION="${{ github.event.release.tag_name }}"
-          SEMVER_VERSION="${SEMVER_VERSION#v}"
+          # Safely format the organization name to lowercase for GHCR
+          REPO_OWNER=$(echo "${{ github.repository_owner }}" | tr '[:upper:]' '[:lower:]')
 
-          helm push zylos-service-base-${SEMVER_VERSION}.tgz oci://ghcr.io/zylos-platform/charts
+          # Push the artifact using the variables already in scope
+          helm push zylos-service-base-${SEMVER_VERSION}.tgz oci://ghcr.io/${REPO_OWNER}/charts
