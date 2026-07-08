@@ -10,7 +10,6 @@ concurrency:
 
 permissions:
   contents: read
-  packages: write
 
 jobs:
 
@@ -27,10 +26,10 @@ jobs:
           version: v3.16.0
 
       - name: Lint Zylos Base Chart
-        run: helm lint .
+        run: helm lint zylos-service-base --strict
 
       - name: Template Validation
-        run: helm template test-release . > /dev/null
+        run: helm template test-release zylos-service-base --kube-version 1.32.0 > /dev/null
 
   conventional-commits:
     name: Conventional Commits
