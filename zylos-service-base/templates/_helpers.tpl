@@ -93,3 +93,17 @@ extras from .Values.otel.extraResourceAttributes (map of name -> value).
 {{- end -}}
 {{- join "," $parts -}}
 {{- end -}}
+
+{{/*
+Render a smart map of environment variables
+*/}}
+{{- define "zylos.extraEnv" -}}
+{{- range $key, $val := . }}
+- name: {{ $key }}
+  {{- if kindIs "map" $val }}
+  {{- toYaml $val | nindent 2 }}
+  {{- else }}
+  value: {{ $val | quote }}
+  {{- end }}
+{{- end }}
+{{- end -}}

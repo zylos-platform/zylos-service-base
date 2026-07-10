@@ -81,10 +81,9 @@ spec:
               value: {{ include "service.name" . | quote }}
             - name: OTEL_RESOURCE_ATTRIBUTES
               value: {{ include "service.otelResourceAttrs" . | quote }}
-            {{ range $key, $value := .Values.extraEnv }}
-            - name: {{ $key }}
-              value: {{ $value | quote }}
-            {{ end }}
+            {{- if .Values.extraEnv }}
+            {{ include "zylos.extraEnv" .Values.extraEnv | nindent 12 }}
+            {{- end }}
           {{- with .Values.extraEnvFrom }}
           envFrom: {{ toYaml . | nindent 12 }}
           {{- end }}
