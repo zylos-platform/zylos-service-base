@@ -238,6 +238,8 @@ networkPolicy:
   ingress:
     # Allow ingress from istio-system (ztunnel, waypoint, gateways).
     fromIstio: true
+    # Allow all traffic from other pods within the SAME namespace.
+    fromSameDomain: true
     # Allow Prometheus to scrape the management port.
     fromObservability: true
     # Allow ingress-nginx to reach this pod (for services with public Ingress).
@@ -250,14 +252,15 @@ networkPolicy:
     toDns: true
     # Allow egress to istio-system (for waypoint forwarding).
     toIstio: true
-    # Allow egress to other zylos-services pods (intra-platform mesh traffic).
-    toSamePlatform: true
-    # Allow unrestricted external (Internet) egress. Default off; turn on
-    # only for services that need direct external API calls (e.g., gateway
-    # talking to Keycloak when Keycloak is external, BFFs hitting external IdPs).
-    toKeycloak: true
-    toOpa: true
+    # Allow traffic ONLY within the same domain namespace.
+    toSameDomain: true
+    # Allow egress to identity server.
+    toIdentity: true
+    # Allow egress to OPA (Open Policy Agent) service.
+    toOpa: false
+    # Allow egress to toObservability.
     toObservability: true
+    # Allow unrestricted external (Internet) egress.
     toExternal: false
     # Extra egress rules in raw NetworkPolicy `to`/`ports` form.
     extra: [ ]
