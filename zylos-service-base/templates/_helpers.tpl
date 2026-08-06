@@ -107,3 +107,43 @@ Render a smart map of environment variables
   {{- end }}
 {{- end }}
 {{- end -}}
+
+{{/*
+Define the dynamic ingress rules
+*/}}
+{{- define "service.netpol.ingressRules" -}}
+{{- if .Values.networkPolicy.enabled -}}
+{{- if .Values.networkPolicy.ingress.extra }}
+{{ toYaml .Values.networkPolicy.ingress.extra }}
+{{- end }}
+{{- end -}}
+{{- end -}}
+
+{{/*
+Define the dynamic egress rules
+*/}}
+{{- define "service.netpol.egressRules" -}}
+{{- if .Values.networkPolicy.egress.toIdentity }}
+- to:
+    - namespaceSelector:
+        matchLabels:
+          kubernetes.io/metadata.name: zylos-identity
+  ports:
+    - protocol: TCP
+      port: 80
+    - protocol: TCP
+      port: 443
+{{- end }}
+{{- if .Values.networkPolicy.egress.toOpa }}
+- to:
+    - namespaceSelector:
+        matchLabels:
+          kubernetes.io/metadata.name: opa
+  ports:
+    - protocol: TCP
+      port: 8181
+{{- end }}
+{{- if .Values.networkPolicy.egress.extra }}
+{{ toYaml .Values.networkPolicy.egress.extra }}
+{{- end }}
+{{- end -}}
