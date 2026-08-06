@@ -112,11 +112,9 @@ Render a smart map of environment variables
 Define the dynamic ingress rules
 */}}
 {{- define "service.netpol.ingressRules" -}}
-{{- if .Values.networkPolicy.enabled -}}
 {{- if .Values.networkPolicy.ingress.extra }}
 {{ toYaml .Values.networkPolicy.ingress.extra }}
 {{- end }}
-{{- end -}}
 {{- end -}}
 
 {{/*
@@ -145,5 +143,30 @@ Define the dynamic egress rules
 {{- end }}
 {{- if .Values.networkPolicy.egress.extra }}
 {{ toYaml .Values.networkPolicy.egress.extra }}
+{{- end }}
+{{- end -}}
+
+{{/*
+Define the authorization policy
+*/}}
+{{- define "service.authz.rules" -}}
+{{- if .Values.authorizationPolicy.allowedCallers }}
+- from:
+    - source:
+        principals:
+        {{- range .Values.authorizationPolicy.allowedCallers }}
+          - "cluster.local/ns/{{ .namespace }}/sa/{{ .serviceAccount }}"
+        {{- end }}
+  {{- if .Values.authorizationPolicy.allowedPorts }}
+  to:
+    - operation:
+        ports:
+        {{- range .Values.authorizationPolicy.allowedPorts }}
+          - {{ . | quote }}
+        {{- end }}
+  {{- end }}
+{{- end }}
+{{- if .Values.authorizationPolicy.extraRules }}
+{{- toYaml .Values.authorizationPolicy.extraRules }}
 {{- end }}
 {{- end -}}
