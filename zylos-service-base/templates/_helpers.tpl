@@ -27,6 +27,7 @@ Common labels (used on every resource).
 {{- define "service.labels" -}}
 app.kubernetes.io/name: {{ include "service.name" . }}
 app.kubernetes.io/instance: {{ .Release.Name }}
+app.kubernetes.io/component: {{ .Values.component | default "api" }}
 app.kubernetes.io/version: {{ .Values.image.tag | quote }}
 app.kubernetes.io/managed-by: {{ .Release.Service }}
 app.kubernetes.io/part-of: zylos-platform
@@ -40,6 +41,7 @@ Kept stable across image-tag changes (no `version` label).
 {{- define "service.selectorLabels" -}}
 app.kubernetes.io/name: {{ include "service.name" . }}
 app.kubernetes.io/instance: {{ .Release.Name }}
+app.kubernetes.io/component: {{ .Values.component | default "api" }}
 {{- end -}}
 
 {{/*
@@ -85,7 +87,7 @@ extras from .Values.otel.extraResourceAttributes (map of name -> value).
 */}}
 {{- define "service.otelResourceAttrs" -}}
 {{- $parts := list -}}
-{{- $parts = append $parts (printf "service.namespace=zylos") -}}
+{{- $parts = append $parts (printf "service.namespace=%s" .Release.Namespace) -}}
 {{- $parts = append $parts (printf "deployment.environment=%s" .Values.environment) -}}
 {{- $parts = append $parts (printf "service.version=%s" (include "service.versionAttr" .)) -}}
 {{- range $k, $v := .Values.otel.extraResourceAttributes -}}

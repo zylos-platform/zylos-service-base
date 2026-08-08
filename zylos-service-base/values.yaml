@@ -10,6 +10,7 @@
 # -----------------------------------------------------------------------------
 nameOverride: ""
 fullnameOverride: ""
+component: "api"
 
 # -----------------------------------------------------------------------------
 # Image
@@ -240,7 +241,7 @@ networkPolicy:
     extra: [ ]
   egress:
     # Allow egress to identity server.
-    toIdentity: true
+    toIdentity: false
     # Allow egress to OPA (Open Policy Agent) service.
     toOpa: false
     # Extra egress rules in raw NetworkPolicy `to`/`ports` form.
