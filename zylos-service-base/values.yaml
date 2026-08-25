@@ -257,17 +257,17 @@ authorizationPolicy:
   action: ALLOW
 
   # Simplified caller list (Namespace + ServiceAccount)
-  allowedCallers: []
+  allowedCallers: [ ]
   # Example:
   # - namespace: zylos-infra-gateway
   #   serviceAccount: gateway-sa
 
   # Restrict allowed callers to specific ports (optional)
-  allowedPorts: []
+  allowedPorts: [ ]
   # Example: [8080]
 
   # Escape hatch for advanced L7 rules (e.g. HTTP paths, verbs, headers)
-  extraRules: []
+  extraRules: [ ]
 
 # -----------------------------------------------------------------------------
 # Pod-level miscellaneous
@@ -278,3 +278,27 @@ terminationGracePeriodSeconds: 30
 nodeSelector: { }
 # When non-empty, applied as pod tolerations.
 tolerations: [ ]
+
+# -----------------------------------------------------------------------------
+# HTTPRoute (Gateway API)
+# -----------------------------------------------------------------------------
+httpRoute:
+  # Disabled by default so internal background services don't accidentally expose endpoints
+  enabled: false
+
+  parentRef:
+    name: zylos-edge-gateway
+    namespace: zylos-infra-gateway
+    sectionName: https
+
+  # Optional hostname restriction
+  hostnames: [ ]
+
+  # Simplified list of path prefixes to route to this service
+  paths: [ ]
+  # Example:
+  # - value: /api/v1/products
+  #   type: PathPrefix
+
+  # Raw escape hatch for advanced Gateway API rules
+  extraRules: [ ]
